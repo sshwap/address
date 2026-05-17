@@ -12,6 +12,7 @@ const (
 	BTC  Coin = "BTC"
 	ETH  Coin = "ETH"
 	USDT Coin = "USDT"
+	USDC Coin = "USDC"
 	XRP  Coin = "XRP"
 	SOL  Coin = "SOL"
 	BCH  Coin = "BCH"
@@ -20,6 +21,29 @@ const (
 	TRX  Coin = "TRX"
 	FIRO Coin = "FIRO"
 	ZANO Coin = "ZANO"
+	BNB  Coin = "BNB"
+	ADA  Coin = "ADA"
+	DOGE Coin = "DOGE"
+	LINK Coin = "LINK"
+	TON  Coin = "TON"
+	AVAX Coin = "AVAX"
+	SUI  Coin = "SUI"
+	DOT  Coin = "DOT"
+	XLM  Coin = "XLM"
+	HBAR Coin = "HBAR"
+	NEAR Coin = "NEAR"
+	ATOM Coin = "ATOM"
+	ETC  Coin = "ETC"
+	APT  Coin = "APT"
+	KAS  Coin = "KAS"
+	FIL  Coin = "FIL"
+	VET  Coin = "VET"
+	ARB  Coin = "ARB"
+	OP   Coin = "OP"
+	ALGO Coin = "ALGO"
+	STX  Coin = "STX"
+	INJ  Coin = "INJ"
+	SEI  Coin = "SEI"
 )
 
 // Network represents a blockchain network type.
@@ -56,11 +80,12 @@ func Validate(coin Coin, address string, opts ...Options) bool {
 	switch coin {
 	case BTC:
 		return ValidateBitcoin(address, opt.Network)
-	case ETH:
+	case ETH, LINK, ETC, ARB, OP:
 		return ValidateEthereum(address)
-	case USDT:
-		// USDT can be on multiple networks; check common ones
-		return ValidateEthereum(address) || ValidateTron(address)
+	case BNB:
+		return ValidateEthereum(address) // BSC uses ETH format
+	case USDT, USDC:
+		return ValidateEthereum(address) || ValidateTron(address) || ValidateSolana(address)
 	case XRP:
 		return ValidateRipple(address)
 	case SOL:
@@ -77,13 +102,48 @@ func Validate(coin Coin, address string, opts ...Options) bool {
 		return ValidateFiro(address, opt.Network)
 	case ZANO:
 		return ValidateZano(address)
+	case ADA:
+		return ValidateCardano(address, opt.Network)
+	case DOGE:
+		return ValidateDogecoin(address)
+	case TON:
+		return ValidateTON(address)
+	case AVAX:
+		return ValidateEthereum(address) // C-Chain uses ETH format
+	case SUI:
+		return ValidateSUI(address)
+	case DOT:
+		return ValidatePolkadot(address)
+	case XLM:
+		return ValidateStellar(address)
+	case HBAR:
+		return ValidateHedera(address)
+	case NEAR:
+		return ValidateNEAR(address)
+	case ATOM:
+		return ValidateCosmos(address)
+	case APT:
+		return ValidateAptos(address)
+	case KAS:
+		return ValidateKaspa(address)
+	case FIL:
+		return ValidateFilecoin(address)
+	case VET:
+		return ValidateVeChain(address)
+	case ALGO:
+		return ValidateAlgorand(address)
+	case STX:
+		return ValidateStacks(address, opt.Network)
+	case INJ:
+		return ValidateInjective(address)
+	case SEI:
+		return ValidateSei(address)
 	default:
 		return false
 	}
 }
 
 // ValidateForNetwork validates an address for a specific coin and network string.
-// The network parameter should match common network identifiers like "ETH", "TRX", "ERC20", "TRC20", etc.
 func ValidateForNetwork(coin Coin, network, address string) bool {
 	if address == "" {
 		return false
@@ -91,21 +151,56 @@ func ValidateForNetwork(coin Coin, network, address string) bool {
 
 	network = strings.ToUpper(network)
 
-	// Handle USDT with specific network
-	if coin == USDT {
+	// Multi-network stablecoins
+	if coin == USDT || coin == USDC {
 		switch network {
-		case "ETH", "ERC20", "ERC-20", "ETHEREUM":
+		case "ETH", "ERC20", "ERC-20", "ETHEREUM", "ARBITRUM", "OP", "BASE", "ZKSYNC", "MATIC", "AVAXC", "CELO", "MNT":
 			return ValidateEthereum(address)
 		case "TRX", "TRC20", "TRC-20", "TRON":
 			return ValidateTron(address)
 		case "SOL", "SOLANA", "SPL":
 			return ValidateSolana(address)
 		case "BSC", "BEP20", "BEP-20":
-			return ValidateEthereum(address) // BSC uses same format as ETH
+			return ValidateEthereum(address)
+		case "ALGO":
+			return ValidateAlgorand(address)
+		case "APT":
+			return ValidateAptos(address)
+		case "SUI":
+			return ValidateSUI(address)
 		default:
-			// Try both ETH and TRX formats
-			return ValidateEthereum(address) || ValidateTron(address)
+			return ValidateEthereum(address) || ValidateTron(address) || ValidateSolana(address)
 		}
+	}
+
+	// Coins available on BSC as wrapped tokens (ETH format)
+	if network == "BSC" || network == "BEP20" || network == "BEP-20" {
+		return ValidateEthereum(address)
+	}
+
+	// ETH L2 networks
+	if network == "ARBITRUM" || network == "OP" || network == "BASE" || network == "ZKSYNC" || network == "MATIC" || network == "AVAXC" {
+		return ValidateEthereum(address)
+	}
+
+	// BNB on OPBNB
+	if coin == BNB && network == "OPBNB" {
+		return ValidateEthereum(address)
+	}
+
+	// AVAX X-Chain (different format) - for now just accept C-Chain
+	if coin == AVAX && network == "CCHAIN" {
+		return ValidateEthereum(address)
+	}
+
+	// SEI EVM
+	if coin == SEI && network == "SEIEVM" {
+		return ValidateEthereum(address)
+	}
+
+	// DOT on Asset Hub
+	if coin == DOT && network == "ASSETHUB" {
+		return ValidatePolkadot(address)
 	}
 
 	// For other coins, use standard validation
@@ -117,8 +212,17 @@ func ValidateMemo(coin Coin, memo string) bool {
 	switch coin {
 	case XRP:
 		return ValidateRippleMemo(memo)
+	case XLM:
+		return ValidateStellarMemo(memo)
+	case HBAR:
+		return ValidateHederaMemo(memo)
+	case ATOM, INJ:
+		return len(memo) <= 256 // Cosmos SDK memo limit
+	case TON:
+		return len(memo) <= 512
+	case STX:
+		return len(memo) <= 34
 	default:
-		// Most coins don't require memo validation
 		return true
 	}
 }

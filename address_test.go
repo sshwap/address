@@ -270,6 +270,425 @@ func TestValidateMonero(t *testing.T) {
 	}
 }
 
+func TestValidateDogecoin(t *testing.T) {
+	valid := []string{
+		"DRSqEwcnJX3GZWH9Twtwk8D5ewqdJzi13k",
+		"DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF",
+		"12KYrjTdVGjFMtaxERSk3gphreJ5US8aUP",
+	}
+
+	for _, addr := range valid {
+		if !ValidateDogecoin(addr) {
+			t.Errorf("ValidateDogecoin(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateDogecoin(addr) {
+			t.Errorf("ValidateDogecoin(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateCardano(t *testing.T) {
+	valid := []string{
+		"addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
+		"addr1q9u5sjt4qmjvlkry3qnlfjx746skkf2w7g2c4nnvpv68kfm4gp2haq5fkcq0fhxg0hpcj9r76h4l0fp7gw4tz6ct7m7qsnfjcf",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"addr1notavalidaddress",
+	}
+
+	for _, addr := range valid {
+		if !ValidateCardano(addr, Mainnet) {
+			t.Errorf("ValidateCardano(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateCardano(addr, Mainnet) {
+			t.Errorf("ValidateCardano(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateTON(t *testing.T) {
+	valid := []string{
+		"EQDtFpEwcFAEcRe5mLVh2N6C0x-_hJEM7W61_JLnSF74p4q2",
+		"UQBvW8Z5huBkMJYdnfAEM5JqTNkuWX3diqYENkWsIL0XggGG",
+		"0:83dfd552e63729b472fcbcc8c45ebcc6691702558b68ec7527e1ba403a0f31a8",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"EQshort",
+		"0:notahexhash",
+	}
+
+	for _, addr := range valid {
+		if !ValidateTON(addr) {
+			t.Errorf("ValidateTON(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateTON(addr) {
+			t.Errorf("ValidateTON(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidatePolkadot(t *testing.T) {
+	valid := []string{
+		"1FRMM8PEiWXYax7rpS6X4XZX1aAAxSWx1CrKTyrVYhV24fg",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"5short",
+	}
+
+	for _, addr := range valid {
+		if !ValidatePolkadot(addr) {
+			t.Errorf("ValidatePolkadot(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidatePolkadot(addr) {
+			t.Errorf("ValidatePolkadot(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateStellar(t *testing.T) {
+	valid := []string{
+		"GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN7",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"GABCDEFG",
+		"GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCXXX",
+	}
+
+	for _, addr := range valid {
+		if !ValidateStellar(addr) {
+			t.Errorf("ValidateStellar(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateStellar(addr) {
+			t.Errorf("ValidateStellar(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateHedera(t *testing.T) {
+	valid := []string{
+		"0.0.12345",
+		"0.0.1",
+		"0.0.98",
+		"0.0.1234567890",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"0.0.0",
+		"1.2",
+		"0.0",
+		"abc.def.ghi",
+	}
+
+	for _, addr := range valid {
+		if !ValidateHedera(addr) {
+			t.Errorf("ValidateHedera(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateHedera(addr) {
+			t.Errorf("ValidateHedera(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateNEAR(t *testing.T) {
+	valid := []string{
+		"alice.near",
+		"bob.testnet",
+		"example-account.near",
+		"a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+		"system",
+	}
+
+	invalid := []string{
+		"",
+		"A",
+		"UPPERCASE.near",
+		"a",
+		"has spaces.near",
+		"double..dots.near",
+	}
+
+	for _, addr := range valid {
+		if !ValidateNEAR(addr) {
+			t.Errorf("ValidateNEAR(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateNEAR(addr) {
+			t.Errorf("ValidateNEAR(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateCosmos(t *testing.T) {
+	valid := []string{
+		"cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"cosmos1invalid",
+	}
+
+	for _, addr := range valid {
+		if !ValidateCosmos(addr) {
+			t.Errorf("ValidateCosmos(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateCosmos(addr) {
+			t.Errorf("ValidateCosmos(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateAptos(t *testing.T) {
+	valid := []string{
+		"0x1",
+		"0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa",
+		"0x0000000000000000000000000000000000000000000000000000000000000001",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"1234",
+		"0xGGGG",
+	}
+
+	for _, addr := range valid {
+		if !ValidateAptos(addr) {
+			t.Errorf("ValidateAptos(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateAptos(addr) {
+			t.Errorf("ValidateAptos(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateSUI(t *testing.T) {
+	valid := []string{
+		"0xfa7ac3951fdca92c9200f1e12e8c0a87c8e40101a2ea448f887a33ff0127d56b",
+		"0x0000000000000000000000000000000000000000000000000000000000000002",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"0x1",
+		"0xshort",
+	}
+
+	for _, addr := range valid {
+		if !ValidateSUI(addr) {
+			t.Errorf("ValidateSUI(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateSUI(addr) {
+			t.Errorf("ValidateSUI(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateKaspa(t *testing.T) {
+	valid := []string{
+		"kaspa:qpamkvhgh0kzx50gwvvp5xs8fakrqf6asvnlrd80esxqq4uvkwfk2ez2w6pf8",
+		"kaspa:qr0jhre5a26c37fwew0mzs6yjav54r54j2axyz7xx3r04lfuwqzqcw0lsdvve",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"kaspa:short",
+		"bitcoin:qpamkvhgh0kzx50gwvvp5xs8fakrqf6asvnlrd80esxqq4uvkwfk2ez2w6pf8",
+	}
+
+	for _, addr := range valid {
+		if !ValidateKaspa(addr) {
+			t.Errorf("ValidateKaspa(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateKaspa(addr) {
+			t.Errorf("ValidateKaspa(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateFilecoin(t *testing.T) {
+	valid := []string{
+		"f01234",
+		"f17uoq6tp427uzv7fztkbsnn64iwotfrristwpryy",
+		"f3vvmn62lofvhjd2ugzca6sof2j2ubwok6cj4xxbfzz4yuj7f2xfmzcd25bxa6ex7unvwddcq7sucifdcwmma",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"f0",
+		"f00",
+		"g17uoq6tp427uzv7fztkbsnn64iwotfrristwpryy",
+	}
+
+	for _, addr := range valid {
+		if !ValidateFilecoin(addr) {
+			t.Errorf("ValidateFilecoin(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateFilecoin(addr) {
+			t.Errorf("ValidateFilecoin(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateAlgorand(t *testing.T) {
+	valid := []string{
+		"737777777777777777777777777777777777777777777777777UFEJ2CI",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"short",
+		"737777777777777777777777777777777777777777777777777XXXXXX",
+	}
+
+	for _, addr := range valid {
+		if !ValidateAlgorand(addr) {
+			t.Errorf("ValidateAlgorand(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateAlgorand(addr) {
+			t.Errorf("ValidateAlgorand(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateStacks(t *testing.T) {
+	valid := []string{
+		"SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
+		"SP000000000000000000002Q6VF78",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"12KYrjTdVGjFMtaxERSk3gphreJ5US8aUP",
+	}
+
+	for _, addr := range valid {
+		if !ValidateStacks(addr, Mainnet) {
+			t.Errorf("ValidateStacks(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateStacks(addr, Mainnet) {
+			t.Errorf("ValidateStacks(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateInjective(t *testing.T) {
+	valid := []string{
+		"inj1ady3s7whq30l4fx8sj3x6muv5mx4dfdlcpv8n7",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
+	}
+
+	for _, addr := range valid {
+		if !ValidateInjective(addr) {
+			t.Errorf("ValidateInjective(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateInjective(addr) {
+			t.Errorf("ValidateInjective(%q) = true, want false", addr)
+		}
+	}
+}
+
+func TestValidateSei(t *testing.T) {
+	valid := []string{
+		// Sei EVM addresses
+		"0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF",
+		"0xde709f2102306220921060314715629080e2fb77",
+	}
+
+	invalid := []string{
+		"",
+		"invalid",
+		"cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
+	}
+
+	for _, addr := range valid {
+		if !ValidateSei(addr) {
+			t.Errorf("ValidateSei(%q) = false, want true", addr)
+		}
+	}
+
+	for _, addr := range invalid {
+		if ValidateSei(addr) {
+			t.Errorf("ValidateSei(%q) = true, want false", addr)
+		}
+	}
+}
+
 func TestValidate(t *testing.T) {
 	tests := []struct {
 		coin    Coin
@@ -288,8 +707,22 @@ func TestValidate(t *testing.T) {
 		{XMR, "47zQ5LAivg6hNCgijXSEFVLX7mke1bgM6YGLFaANDoJbgXDymcAAZvvMNt2PmMpqEe5qRy2zyfMYXdwpmdyitiFh84xnPG2", true},
 		{USDT, "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", true},
 		{USDT, "TNDzfERDpxLDS2w1q6yaFC7pzqaSQ3Bg3r", true},
+		// New coins
+		{BNB, "0xde709f2102306220921060314715629080e2fb77", true},
+		{DOGE, "DRSqEwcnJX3GZWH9Twtwk8D5ewqdJzi13k", true},
+		{LINK, "0xde709f2102306220921060314715629080e2fb77", true},
+		{AVAX, "0xde709f2102306220921060314715629080e2fb77", true},
+		{ETC, "0xde709f2102306220921060314715629080e2fb77", true},
+		{VET, "0xde709f2102306220921060314715629080e2fb77", true},
+		{ARB, "0xde709f2102306220921060314715629080e2fb77", true},
+		{OP, "0xde709f2102306220921060314715629080e2fb77", true},
+		{HBAR, "0.0.12345", true},
+		{APT, "0x1", true},
+		// Invalid
 		{BTC, "", false},
 		{ETH, "invalid", false},
+		{DOGE, "invalid", false},
+		{HBAR, "invalid", false},
 	}
 
 	for _, tt := range tests {
@@ -315,12 +748,50 @@ func TestValidateForNetwork(t *testing.T) {
 		{USDT, "BSC", "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", true},
 		{USDT, "ERC20", "TNDzfERDpxLDS2w1q6yaFC7pzqaSQ3Bg3r", false},
 		{USDT, "TRC20", "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", false},
+		// USDC multi-network
+		{USDC, "ETH", "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", true},
+		{USDC, "SOL", "833XorXTTx5iya5B3Tr6iqEs9GbRuvVfwyLCP2vpdzhq", true},
+		{USDC, "TRX", "TNDzfERDpxLDS2w1q6yaFC7pzqaSQ3Bg3r", true},
+		// BSC wrapped tokens
+		{DOGE, "BSC", "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", true},
+		{ATOM, "BSC", "0xE37c0D48d68da5c5b14E5c1a9f1CFE802776D9FF", true},
+		// L2 networks
+		{LINK, "ARBITRUM", "0xde709f2102306220921060314715629080e2fb77", true},
 	}
 
 	for _, tt := range tests {
 		result := ValidateForNetwork(tt.coin, tt.network, tt.address)
 		if result != tt.valid {
 			t.Errorf("ValidateForNetwork(%v, %q, %q) = %v, want %v", tt.coin, tt.network, tt.address, result, tt.valid)
+		}
+	}
+}
+
+func TestValidateMemo(t *testing.T) {
+	tests := []struct {
+		coin  Coin
+		memo  string
+		valid bool
+	}{
+		{XRP, "", true},
+		{XRP, "12345", true},
+		{XRP, "4294967296", false},
+		{XLM, "", true},
+		{XLM, "hello", true},
+		{XLM, "this memo is way too long for stellar to accept at all", false},
+		{HBAR, "", true},
+		{HBAR, "test memo", true},
+		{ATOM, "", true},
+		{ATOM, "cosmos memo", true},
+		{TON, "", true},
+		{TON, "ton memo", true},
+		{BTC, "anything", true}, // BTC doesn't use memos
+	}
+
+	for _, tt := range tests {
+		result := ValidateMemo(tt.coin, tt.memo)
+		if result != tt.valid {
+			t.Errorf("ValidateMemo(%v, %q) = %v, want %v", tt.coin, tt.memo, result, tt.valid)
 		}
 	}
 }
